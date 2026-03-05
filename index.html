@@ -40,7 +40,6 @@
         #page-celebration { display: none; opacity: 0; width: 100%; background: var(--bg-bright); color: #333; transition: opacity 1.5s; }
         .scroll-hint { font-size: 0.9rem; letter-spacing: 6px; color: var(--gold); text-transform: uppercase; padding: 100px 0 40px; text-align: center; }
 
-        /* Container Hati: Tinggi disesuaikan */
         .heart-container { position: relative; width: 100%; max-width: 1100px; height: 90vh; min-height: 700px; margin: 0 auto; display: flex; justify-content: center; align-items: center; z-index: 20; }
         
         .center-birthday-text {
@@ -78,7 +77,7 @@
         .message-box { background: white; border-radius: 40px; padding: 60px 40px; max-width: 700px; margin: 80px auto 120px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.03); border: 1px solid #f2f2f2; z-index: 30; position: relative; }
         .personal-note { font-family: 'Dancing Script', cursive; line-height: 1.8; font-size: 1.5rem; color: #444; text-align: left; margin-top: 50px; white-space: pre-line; }
 
-        /* --- Balloons HD (Glossy & Volume) --- */
+        /* --- Balloons HD --- */
         #balloon-container { position: fixed; inset: 0; pointer-events: none; z-index: 9000; }
         .balloon-wrapper { position: absolute; pointer-events: auto; cursor: pointer; display: flex; flex-direction: column; align-items: center; z-index: 9999; }
         
@@ -114,9 +113,9 @@
                 <div class="count-item"><span id="secs">00</span><span>Secs</span></div>
             </div>
             <p style="margin-bottom: 40px; color: rgba(255,255,255,0.6); max-width: 450px; line-height: 1.6; font-size: 0.9rem;">
-                "Haii Leyonn, sekarang kamu sudah memasuki kepala dua lohh. Perjalanan baru dimulai sekarang."
+                "Helloo Leyonn!, Are You Ready To Start The Journey?"
             </p>
-            <button class="next-btn" onclick="startGame()">Buka Surprise</button>
+            <button class="next-btn" onclick="checkPassword()">Open The Surprise</button>
         </section>
     </div>
 
@@ -161,6 +160,16 @@
         let gameInterval;
         const colors = ['#FF5E5E', '#FFD700', '#FF7ED4', '#70FF8B', '#70D1FF', '#FF9F43'];
 
+        // FEATURE: Password Check logic
+        function checkPassword() {
+            const pass = prompt("Input your password:");
+            if (pass === "HBDLEON") {
+                startGame();
+            } else if (pass !== null) {
+                alert("Wrong password! Try again.");
+            }
+        }
+
         function startGame() {
             document.getElementById('page-landing').style.opacity = '0';
             setTimeout(() => {
@@ -175,7 +184,6 @@
         function spawnBalloonLoop() {
             if(!gameActive) return;
             createBalloon('game');
-            // BUG FIX: Perbanyak balon game dengan memperkecil interval spawn
             let nextSpawn = Math.max(100, 600 - (popped * 30)); 
             gameInterval = setTimeout(spawnBalloonLoop, nextSpawn);
         }
@@ -240,16 +248,13 @@
             }, 1500);
         }
 
-        // BUG FIX: Perlebar sedikit bentuk hati foto
         function initHeart() {
             const container = document.getElementById('heart-gallery');
             photos.forEach((src, i) => {
                 const t = (i / photos.length) * (2 * Math.PI);
-                // Skala diperlebar agar hati lebih luas
                 const scaleFactor = clamp(15, window.innerWidth/50, 22);
                 const x = 16 * Math.pow(Math.sin(t), 3) * scaleFactor;
                 const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * scaleFactor;
-                
                 const card = document.createElement('div');
                 card.className = 'polaroid';
                 card.style.left = `calc(50% + ${x}px - 45px)`;
@@ -261,26 +266,15 @@
         }
         function clamp(min, val, max) { return Math.max(min, Math.min(val, max)); }
 
-        // BUG FIX: Tambahkan efek konfeti konsisten berjatuhan di background
         function startContinuousConfetti() {
             const duration = 15 * 1000;
             const animationEnd = Date.now() + duration;
             const defaults = { startVelocity: 10, spread: 360, ticks: 100, zIndex: 50 };
-
-            function randomInRange(min, max) {
-              return Math.random() * (max - min) + min;
-            }
-
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
             const interval = setInterval(function() {
-              const timeLeft = animationEnd - Date.now();
-
-              // Berhenti setelah durasi tertentu (opsional, jika ingin selamanya hapus kondisi ini)
-              // if (timeLeft <= 0) { return clearInterval(interval); }
-
-              const particleCount = 2; // Jumlah sedikit tapi konsisten
-              // Salju konfeti dari atas
+              const particleCount = 2;
               confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 }, colors: colors, gravity: 0.5, scalar: 0.8 }));
-            }, 600); // Interval spawn konsisten
+            }, 600);
         }
 
         const targetDate = new Date("April 13, 2026 00:00:00").getTime();
