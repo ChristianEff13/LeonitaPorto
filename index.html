@@ -4,262 +4,312 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chapter 20 | 13 April</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@200;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Montserrat:wght@200;400;600&family=Dancing+Script:wght@600&family=Noto+Sans+SC:wght@300&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --bg: #03080a; /* Biru sangat gelap (Deep Sea) */
-            --gold: #c5a059;
-            --gold-light: #e5c986;
+            --bg: #03080a; --bg-bright: #fdfbf7; 
+            --gold: #c5a059; --gold-light: #e5c986;
             --white: #ffffff;
-            --gray: #888888;
-            --sun-ray: rgba(255, 255, 255, 0.05);
+            --sun-ray: rgba(255, 255, 255, 0.04);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg); color: var(--white); font-family: 'Montserrat', sans-serif; transition: background-color 1.5s ease; min-height: 100vh; overflow: hidden; }
+        body.allow-scroll { overflow-y: auto; overflow-x: hidden; }
 
-        body {
-            background-color: var(--bg);
-            color: var(--white);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
+        /* --- Landing Page: Deep Sea --- */
+        #page-landing { position: fixed; inset: 0; z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; width: 100%; padding: 20px; }
+        .sunbeams { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% -20%, #1a2a30 0%, #03080a 80%); }
+        .ray { position: absolute; top: -50%; left: 50%; width: 300%; height: 200%; background: repeating-linear-gradient(95deg, transparent 0%, transparent 5%, var(--sun-ray) 7%, transparent 10%, transparent 12%, var(--sun-ray) 15%); transform-origin: center top; animation: raysRotate 25s infinite linear; filter: blur(20px); }
+        @keyframes raysRotate { 0% { transform: translateX(-50%) rotate(0deg); } 100% { transform: translateX(-50%) rotate(15deg); } }
 
-        /* --- Efek Cahaya Matahari Bawah Laut --- */
-        .sunbeams {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            pointer-events: none;
-            overflow: hidden;
-            background: radial-gradient(circle at 50% -20%, #1a2a30 0%, #03080a 80%);
-        }
+        .hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.5rem, 10vw, 6.5rem); font-style: italic; margin-bottom: 20px; color: var(--white); transform: none; }
+        .countdown { display: flex; gap: clamp(10px, 3vw, 25px); margin-bottom: clamp(30px, 8vh, 60px); }
+        .count-item span:first-child { font-size: clamp(2rem, 7vw, 4rem); color: var(--gold-light); display: block; font-family: 'Cormorant Garamond', serif; font-weight: 600; }
+        .count-item span:last-child { font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+        
+        .next-btn { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 18px 50px; border-radius: 100px; cursor: pointer; text-transform: uppercase; letter-spacing: 4px; font-size: 0.75rem; transition: 0.5s; z-index: 20; }
+        .next-btn:hover { background: var(--gold); color: white; box-shadow: 0 0 30px rgba(197, 160, 89, 0.4); }
 
-        .ray {
+        /* --- Game Session --- */
+        #game-session { display: none; position: fixed; inset: 0; z-index: 500; flex-direction: column; justify-content: center; align-items: center; background: var(--bg-bright); color: #333; }
+        #game-ui h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 8vw, 3.5rem); color: var(--gold); font-style: italic; }
+
+        /* --- Celebration Page --- */
+        #page-celebration { display: none; opacity: 0; width: 100%; background: var(--bg-bright); color: #333; transition: opacity 1.5s; }
+        .scroll-hint { font-size: 0.9rem; letter-spacing: 6px; color: var(--gold); text-transform: uppercase; padding: 100px 0 40px; text-align: center; }
+
+        /* Container Hati: Tinggi disesuaikan */
+        .heart-container { position: relative; width: 100%; max-width: 1100px; height: 90vh; min-height: 700px; margin: 0 auto; display: flex; justify-content: center; align-items: center; z-index: 20; }
+        
+        .center-birthday-text {
             position: absolute;
-            top: -50%;
-            left: 50%;
-            width: 300%;
-            height: 200%;
-            background: repeating-linear-gradient(
-                95deg,
-                transparent 0%,
-                transparent 5%,
-                var(--sun-ray) 7%,
-                transparent 10%,
-                transparent 12%,
-                var(--sun-ray) 15%
-            );
-            transform-origin: center top;
-            animation: raysRotate 20s infinite linear;
-            filter: blur(15px);
-        }
-
-        @keyframes raysRotate {
-            0% { transform: translateX(-50%) rotate(0deg); }
-            100% { transform: translateX(-50%) rotate(10deg); }
-        }
-
-        /* --- Hero Section --- */
-        .hero {
-            height: 100vh;
+            font-family: 'Dancing Script', cursive;
+            color: var(--gold);
+            text-align: center;
+            z-index: 50;
+            opacity: 1;
+            pointer-events: none;
+            text-shadow: 2px 2px 15px rgba(255, 255, 255, 0.6), 0 0 5px rgba(197, 160, 89, 0.5);
+            line-height: 1.2;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            text-align: center;
+            justify-content: center;
+        }
+        .center-birthday-text .hd-title {
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 600;
+        }
+        .center-birthday-text .name-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-top: -5px;
+            text-transform: none; font-style: normal;
+        }
+
+        .polaroid { position: absolute; background: white; padding: 5px 5px 18px 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); width: clamp(70px, 12vw, 90px); transition: 0.4s; z-index: 20; }
+        .polaroid img { width: 100%; height: clamp(60px, 10vw, 85px); object-fit: cover; }
+        .polaroid:hover { transform: scale(2.5) rotate(0deg) !important; z-index: 1000; box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
+
+        .message-box { background: white; border-radius: 40px; padding: 60px 40px; max-width: 700px; margin: 80px auto 120px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.03); border: 1px solid #f2f2f2; z-index: 30; position: relative; }
+        .personal-note { font-family: 'Dancing Script', cursive; line-height: 1.8; font-size: 1.5rem; color: #444; text-align: left; margin-top: 50px; white-space: pre-line; }
+
+        /* --- Balloons HD (Glossy & Volume) --- */
+        #balloon-container { position: fixed; inset: 0; pointer-events: none; z-index: 9000; }
+        .balloon-wrapper { position: absolute; pointer-events: auto; cursor: pointer; display: flex; flex-direction: column; align-items: center; z-index: 9999; }
+        
+        .balloon { 
+            width: 70px; height: 90px; 
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%; 
             position: relative;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 20%),
+                        linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(0,0,0,0.1) 100%);
+            box-shadow: inset 0 -10px 15px rgba(0,0,0,0.15),
+                        inset 0 10px 15px rgba(255,255,255,0.4),
+                        0 5px 15px rgba(0,0,0,0.1);
+        }
+        .balloon::after {
+            content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+            border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 10px solid; opacity: 0.8;
         }
 
-        .hero span {
-            text-transform: uppercase;
-            letter-spacing: 8px;
-            color: var(--gold);
-            font-size: 0.8rem;
-            margin-bottom: 20px;
-            animation: fadeIn 3s ease;
-        }
-
-        .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(3rem, 10vw, 6.5rem);
-            font-weight: 400;
-            text-shadow: 0 0 30px rgba(255,255,255,0.1);
-        }
-
-        /* --- Countdown --- */
-        .countdown {
-            display: flex;
-            gap: 25px;
-            margin-top: 40px;
-        }
-
-        .count-item { display: flex; flex-direction: column; }
-        .count-item span:first-child {
-            font-size: 2.8rem;
-            font-family: 'Playfair Display', serif;
-            color: var(--gold-light);
-        }
-        .count-item span:last-child {
-            font-size: 0.6rem;
-            letter-spacing: 2px;
-            color: var(--gray);
-            text-transform: uppercase;
-        }
-
-        /* --- Floating Particles (Marine Snow) --- */
-        #marine-snow {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-        }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 50px 30px;
-            border-radius: 30px;
-            margin: 100px auto 40px auto;
-            max-width: 600px;
-            text-align: center;
-        }
-
-        .quote {
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-            font-size: 1.4rem;
-            line-height: 1.8;
-            color: #d1d1d1;
-        }
-
-        /* --- Button Style --- */
-        .button-container {
-            text-align: center;
-            margin-bottom: 100px;
-        }
-
-        .next-btn {
-            background: transparent;
-            color: var(--gold);
-            border: 1px solid var(--gold);
-            padding: 15px 30px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            cursor: pointer;
-            border-radius: 50px;
-            transition: all 0.4s ease;
-            backdrop-filter: blur(5px);
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .next-btn:hover {
-            background: var(--gold);
-            color: var(--bg);
-            box-shadow: 0 0 20px rgba(197, 160, 89, 0.4);
-            transform: translateY(-3px);
-        }
-
-        footer {
-            padding: 80px;
-            text-align: center;
-            font-size: 0.7rem;
-            letter-spacing: 4px;
-            color: var(--gray);
-            opacity: 0.6;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .string-svg { width: 30px; height: 80px; margin-top: -3px; }
     </style>
 </head>
 <body>
 
-    <div class="sunbeams">
-        <div class="ray"></div>
+    <div id="page-landing">
+        <div class="sunbeams"><div class="ray"></div></div>
+        <canvas id="marine-snow" style="position:fixed; inset:0; z-index:-1;"></canvas>
+        <section style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%;">
+            <div class="hero"><h1>Nineteen to <span style="color: var(--gold)">Twenty</span></h1></div>
+            <div class="countdown">
+                <div class="count-item"><span id="days">00</span><span>Days</span></div>
+                <div class="count-item"><span id="hours">00</span><span>Hours</span></div>
+                <div class="count-item"><span id="mins">00</span><span>Mins</span></div>
+                <div class="count-item"><span id="secs">00</span><span>Secs</span></div>
+            </div>
+            <p style="margin-bottom: 40px; color: rgba(255,255,255,0.6); max-width: 450px; line-height: 1.6; font-size: 0.9rem;">
+                "Haii Leyonn, sekarang kamu sudah memasuki kepala dua lohh. Perjalanan baru dimulai sekarang."
+            </p>
+            <button class="next-btn" onclick="startGame()">Buka Surprise</button>
+        </section>
     </div>
-    <canvas id="marine-snow"></canvas>
 
-    <section class="hero">
-        <span>April 13 • Transition</span>
-        <h1 style="margin-bottom: 10px;">Nineteen</h1>
-        <h1 style="font-style: italic; margin-bottom: 20px;">to</h1>
-        <h1 style="color: var(--gold);">Twenty</h1>
-        
-        <div class="countdown" id="timer">
-            <div class="count-item"><span id="days">00</span><span>Days</span></div>
-            <div class="count-item"><span id="hours">00</span><span>Hrs</span></div>
-            <div class="count-item"><span id="mins">00</span><span>Min</span></div>
-            <div class="count-item"><span id="secs">00</span><span>Sec</span></div>
+    <div id="game-session">
+        <div id="game-ui">
+            <h2>Pop 20 Balloons!</h2>
+            <div style="letter-spacing: 3px; color: #888; margin-top: 10px;">POPPED: <span id="pop-count" style="color: var(--gold)">0</span> / 20</div>
         </div>
-    </section>
-
-    <div class="glass-card">
-        <p class="quote">
-            "Haii Leyonn, sekarang kamu sudah bukan umur belasan lagii. Kamu sudah memasuki kepala dua lohh. Mungkin kedepannya engga akan mudah, tapi dari situlah kita belajar untuk semakin kuat dan berkembang untuk mencapai cita-cita kita."
-        </p>
     </div>
 
-    <div class="button-container">
-        <a href="#next-section" class="next-btn">Apakah kamu sudah siap untuk naik ke level 20?</a>
+    <div id="page-celebration">
+        <div class="scroll-hint">Amazing! Scroll Down ↓</div>
+        <div class="heart-container" id="heart-gallery">
+            <div class="center-birthday-text">
+                <div class="hd-title">Happy Birthday</div>
+                <div class="name-title">Leyonn!</div>
+            </div>
+        </div>
+
+        <div class="message-box">
+            <p style="font-family: 'Cormorant Garamond'; font-style: italic; font-size: 1.8rem; font-weight: 600;">"Maybe I’m not the best boyfriend, but you are truly the best girlfriend."</p>
+            <p style="color: var(--gold); margin: 20px 0; font-family: 'Noto Sans SC'; letter-spacing: 2px;">“也许我不是最好的男朋友，但你绝对是最好的女朋友。”</p>
+            <p class="personal-note">
+                Halooo Lemon, sekarang kamu udah umur 20 lohh, gak berasa yaa waktu udah bawa kamu ke umur yang sekarang, dan mungkin kamu gak nyangka juga bisa ketemu aku di tengah-tengah perjalanan kamu. 
+
+                Happyy birthdayy yaaa My Deer Lemonn, mungkin aku bukan pacar yang terbaik, tapii kamuu yangg merupakan pacar terbaik buatt aku. Aku berdoa untuk kesehatan kamu, perlindungan buat kamu, berkat melimpah, umur yang panjang, dan masa depan yang Indah buat kamu Leyonn.
+
+                Maaff jugaa yaa kalau aku engga bisa kasih kamu hadiah yangg mungkin kamu inginkan. Tapi aku harap kamu suka hadiah yangg akan aku kasih ke kamu Lemonn.
+
+                Sekali lagii happyy birthhdayyy yaaa Lemonnn, My Deer Lemonnn. I Lovee Youu Leonita Kumala Dewi, our love will be forever.
+            </p>
+        </div>
     </div>
 
-    <footer>
-        EST. APRIL 13 &bull; 2026 &bull; NEW DEPTHS
-    </footer>
+    <div id="balloon-container"></div>
 
     <script>
-        // Countdown Logic (Target 13 April 2026)
-        const targetDate = new Date("April 13, 2026 00:00:00").getTime();
-        function update() {
-            const now = new Date().getTime();
-            const diff = targetDate - now;
-            document.getElementById("days").innerText = Math.floor(diff / (86400000));
-            document.getElementById("hours").innerText = Math.floor((diff % 86400000) / 3600000);
-            document.getElementById("mins").innerText = Math.floor((diff % 3600000) / 60000);
-            document.getElementById("secs").innerText = Math.floor((diff % 60000) / 1000);
+        const photos = ['https://i.postimg.cc/Q9t6F51F/image.jpg', 'https://i.postimg.cc/YG9XvgYL/image.jpg', 'https://i.postimg.cc/sQXnMS77/image.jpg', 'https://i.postimg.cc/mzDdPMC7/image.jpg', 'https://i.postimg.cc/G82M4YGJ/image.jpg', 'https://i.postimg.cc/gXJMxR8H/image.jpg', 'https://i.postimg.cc/5Y0PXvLm/image.jpg', 'https://i.postimg.cc/JDnTsJZq/image.jpg', 'https://i.postimg.cc/TyTNXBPc/image.jpg', 'https://i.postimg.cc/XZxHNxZm/image.jpg', 'https://i.postimg.cc/qtQbBQtD/image.jpg', 'https://i.postimg.cc/QBS4NSBP/image.jpg', 'https://i.postimg.cc/SXVTQVXv/image.jpg', 'https://i.postimg.cc/KKQqcQkS/image.jpg', 'https://i.postimg.cc/67zj6z2X/image.jpg', 'https://i.postimg.cc/4KwL4w7R/image.jpg', 'https://i.postimg.cc/2qTcjTbm/image.jpg', 'https://i.postimg.cc/QBS4NS9x/image.jpg', 'https://i.postimg.cc/KkH0BzDM/image.jpg', 'https://i.postimg.cc/3y9Sr94r/image.jpg', 'https://i.postimg.cc/8FwKkwJC/image.jpg', 'https://i.postimg.cc/JyK67KD0/image.jpg', 'https://i.postimg.cc/LYXyJfL2/image.jpg', 'https://i.postimg.cc/S2sZn8Cm/image.jpg', 'https://i.postimg.cc/WF39drgt/image.jpg', 'https://i.postimg.cc/47d8YtVK/image.jpg', 'https://i.postimg.cc/R6DgKFL7/image.jpg', 'https://i.postimg.cc/dkx5r1jT/image.jpg', 'https://i.postimg.cc/7GWK06ng/image.jpg', 'https://i.postimg.cc/KkH0BzDN/image.jpg', 'https://i.postimg.cc/dkx5r1j9/image.jpg', 'https://i.postimg.cc/BLVmH6Bp/image.jpg', 'https://i.postimg.cc/Hch6Xx93/image.jpg'];
+
+        let popped = 0;
+        let gameActive = false;
+        let gameInterval;
+        const colors = ['#FF5E5E', '#FFD700', '#FF7ED4', '#70FF8B', '#70D1FF', '#FF9F43'];
+
+        function startGame() {
+            document.getElementById('page-landing').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('page-landing').style.display = 'none';
+                document.getElementById('game-session').style.display = 'flex';
+                document.body.style.backgroundColor = 'var(--bg-bright)';
+                gameActive = true;
+                spawnBalloonLoop();
+            }, 800);
         }
-        setInterval(update, 1000);
-        update();
 
-        // Marine Snow (Floating Dust)
-        const canvas = document.getElementById('marine-snow');
-        const ctx = canvas.getContext('2d');
+        function spawnBalloonLoop() {
+            if(!gameActive) return;
+            createBalloon('game');
+            // BUG FIX: Perbanyak balon game dengan memperkecil interval spawn
+            let nextSpawn = Math.max(100, 600 - (popped * 30)); 
+            gameInterval = setTimeout(spawnBalloonLoop, nextSpawn);
+        }
+
+        function createBalloon(type) {
+            const container = document.getElementById('balloon-container');
+            const wrap = document.createElement('div');
+            wrap.className = 'balloon-wrapper';
+            const color = colors[Math.floor(Math.random()*colors.length)];
+            wrap.style.left = (10 + Math.random() * 80) + 'vw';
+            wrap.style.bottom = '-150px';
+            
+            wrap.innerHTML = `
+                <div class="balloon" style="background:${color}; --b-color:${color}"></div>
+                <svg class="string-svg" viewBox="0 0 40 100"><path d="M20,0 Q35,25 20,50 T20,100" stroke="rgba(0,0,0,0.15)" stroke-width="2" fill="none" /></svg>`;
+            
+            wrap.querySelector('.balloon').style.setProperty('--b-color', color);
+            const triangleStyle = document.createElement('style');
+            triangleStyle.innerHTML = `.balloon-wrapper[style*="left"] .balloon::after { border-top-color: ${color} !important; }`;
+            document.head.appendChild(triangleStyle);
+
+            wrap.onclick = (e) => {
+                confetti({ origin: { x: e.clientX/window.innerWidth, y: e.clientY/window.innerHeight }, colors: [color, '#fff'], particleCount: 35, zIndex: 10000 });
+                wrap.remove();
+                if(type === 'game' && gameActive) {
+                    popped++;
+                    document.getElementById('pop-count').innerText = popped;
+                    if(popped >= 20) triggerFinale();
+                }
+            };
+            
+            const dur = type === 'game' ? (2.8 - (popped * 0.1)) : (6 + Math.random()*3);
+            wrap.animate([{ bottom: '-150px' }, { bottom: '120vh' }], { duration: Math.max(1200, dur * 1000), easing: 'linear' }).onfinish = () => wrap.remove();
+            container.appendChild(wrap);
+        }
+
+        function triggerFinale() {
+            gameActive = false;
+            clearTimeout(gameInterval);
+            let count = 0;
+            const interval = setInterval(() => {
+                confetti({ particleCount: 150, spread: 80, origin: { x: Math.random(), y: 0.5 }, zIndex: 10001 });
+                count++;
+                if(count >= 6) {
+                    clearInterval(interval);
+                    setTimeout(endGame, 1000);
+                }
+            }, 350);
+        }
+
+        function endGame() {
+            const gameSess = document.getElementById('game-session');
+            gameSess.style.transition = "opacity 1.5s";
+            gameSess.style.opacity = "0";
+            setTimeout(() => {
+                gameSess.style.display = 'none';
+                document.body.classList.add('allow-scroll');
+                const celeb = document.getElementById('page-celebration');
+                celeb.style.display = 'block';
+                setTimeout(() => { celeb.style.opacity = '1'; initHeart(); startContinuousConfetti(); }, 50);
+                setInterval(() => createBalloon('bg'), 2500);
+            }, 1500);
+        }
+
+        // BUG FIX: Perlebar sedikit bentuk hati foto
+        function initHeart() {
+            const container = document.getElementById('heart-gallery');
+            photos.forEach((src, i) => {
+                const t = (i / photos.length) * (2 * Math.PI);
+                // Skala diperlebar agar hati lebih luas
+                const scaleFactor = clamp(15, window.innerWidth/50, 22);
+                const x = 16 * Math.pow(Math.sin(t), 3) * scaleFactor;
+                const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * scaleFactor;
+                
+                const card = document.createElement('div');
+                card.className = 'polaroid';
+                card.style.left = `calc(50% + ${x}px - 45px)`;
+                card.style.top = `calc(50% + ${y}px - 45px)`;
+                card.style.transform = `rotate(${Math.random() * 20 - 10}deg)`;
+                card.innerHTML = `<img src="${src}" loading="lazy">`;
+                container.appendChild(card);
+            });
+        }
+        function clamp(min, val, max) { return Math.max(min, Math.min(val, max)); }
+
+        // BUG FIX: Tambahkan efek konfeti konsisten berjatuhan di background
+        function startContinuousConfetti() {
+            const duration = 15 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 10, spread: 360, ticks: 100, zIndex: 50 };
+
+            function randomInRange(min, max) {
+              return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+              const timeLeft = animationEnd - Date.now();
+
+              // Berhenti setelah durasi tertentu (opsional, jika ingin selamanya hapus kondisi ini)
+              // if (timeLeft <= 0) { return clearInterval(interval); }
+
+              const particleCount = 2; // Jumlah sedikit tapi konsisten
+              // Salju konfeti dari atas
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 }, colors: colors, gravity: 0.5, scalar: 0.8 }));
+            }, 600); // Interval spawn konsisten
+        }
+
+        const targetDate = new Date("April 13, 2026 00:00:00").getTime();
+        setInterval(() => {
+            const diff = targetDate - new Date().getTime();
+            if (diff > 0) {
+                document.getElementById("days").innerText = Math.floor(diff/86400000).toString().padStart(2, '0');
+                document.getElementById("hours").innerText = Math.floor((diff%86400000)/3600000).toString().padStart(2, '0');
+                document.getElementById("mins").innerText = Math.floor((diff%3600000)/60000).toString().padStart(2, '0');
+                document.getElementById("secs").innerText = Math.floor((diff%60000)/1000).toString().padStart(2, '0');
+            }
+        }, 1000);
+
+        const mCanvas = document.getElementById('marine-snow');
+        const mCtx = mCanvas.getContext('2d');
         let dots = [];
-
-        function init() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            dots = [];
-            for(let i=0; i<120; i++) {
-                dots.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    s: Math.random() * 1.5,
-                    o: Math.random() * 0.5,
-                    v: Math.random() * 0.2 + 0.1
-                });
+        function initM() {
+            mCanvas.width = window.innerWidth; mCanvas.height = window.innerHeight;
+            dots = []; for(let i=0; i<40; i++) dots.push({x:Math.random()*mCanvas.width, y:Math.random()*mCanvas.height, o:Math.random()*0.3, v:Math.random()*0.3+0.1});
+        }
+        function animM() {
+            mCtx.clearRect(0,0,mCanvas.width, mCanvas.height);
+            if(document.getElementById('page-landing').style.display !== 'none') {
+                dots.forEach(d => { mCtx.fillStyle = `rgba(255,255,255,${d.o})`; mCtx.beginPath(); mCtx.arc(d.x, d.y, 1, 0, Math.PI*2); mCtx.fill(); d.y += d.v; if(d.y > mCanvas.height) d.y = -5; });
+                requestAnimationFrame(animM);
             }
         }
-
-        function animate() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            dots.forEach(d => {
-                ctx.fillStyle = `rgba(255, 255, 255, ${d.o})`;
-                ctx.beginPath();
-                ctx.arc(d.x, d.y, d.s, 0, Math.PI*2);
-                ctx.fill();
-                d.y += d.v;
-                d.x += Math.sin(d.y/50) * 0.2;
-                if(d.y > canvas.height) d.y = -10;
-            });
-            requestAnimationFrame(animate);
-        }
-
-        window.addEventListener('resize', init);
-        init();
-        animate();
+        initM(); animM();
+        window.addEventListener('resize', initM);
     </script>
 </body>
 </html>
