@@ -74,17 +74,29 @@
         .shooting-star::after { content: ''; position: absolute; top: 50%; transform: translateY(-50%); width: 500px; height: 2px; background: linear-gradient(90deg, rgba(255,255,255,0.8), transparent); left: 0; }
 
         #friends-wishes-scene { 
-            display: none; position: absolute; inset: 0; z-index: 100; flex-direction: column; align-items: center; padding-top: 80px; color: #fff; 
-            mask-image: linear-gradient(to bottom, transparent 0%, black 35%, black 75%, transparent 95%);
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 35%, black 75%, transparent 95%);
-        }
+    display: none; 
+    position: absolute; 
+    inset: 0; 
+    z-index: 100; 
+    flex-direction: column; 
+    align-items: center; 
+    padding-top: 80vh; 
+    padding-bottom: 100vh; 
+    color: #fff; 
+    /* TAMBAHKAN BARIS INI: */
+    overflow-y: scroll; 
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
+    scroll-behavior: auto;
+}
+#friends-wishes-scene::-webkit-scrollbar { display: none; }
         #wishes-scroller { position: relative; width: 80%; max-width: 600px; text-align: center; }
         .wish-item { margin-bottom: 120px; transition: 1s; }
         .wish-item h3 { color: var(--gold); font-family: 'Cormorant Garamond'; font-size: 1.8rem; margin-bottom: 10px; }
         .wish-item p { color: #ccc; font-weight: 300; line-height: 1.8; font-size: 1.1rem; }
 
         @keyframes shootingStarAnim { 0% { transform: translate(0,0) rotate(-40deg); opacity: 0; } 10% { opacity: 1; } 40% { transform: translate(-2000px, 1600px) rotate(-40deg); opacity: 0; } 100% { opacity: 0; } }
-        @keyframes scrollUp { 0% { transform: translateY(85vh); } 100% { transform: translateY(-220%); } }
+        
 
         #balloon-container { position: fixed; inset: 0; pointer-events: none; z-index: 9000; }
         .balloon-wrapper { position: absolute; pointer-events: auto; cursor: pointer; display: flex; flex-direction: column; align-items: center; z-index: 9500; }
@@ -177,6 +189,9 @@ Maaff jugaa yaa kalau aku engga bisa kasih kamu hadiah yangg mungkin kamu ingink
 Sekali lagii happyy birthhdayyy yaaa Lemonnn, My Deer Lemonnn. I Lovee Youu Leonita Kumala Dewi, our love will be forever.`;
 
         let popped = 0;
+let autoScrollInterval;
+let resumeTimeout;
+let isUserInteracting = false;
         let gameActive = false;
         let accessType = 'private'; 
         const colors = ['#FF5E5E', '#FFD700', '#FF7ED4', '#70FF8B', '#70D1FF', '#FF9F43'];
@@ -365,11 +380,42 @@ Sekali lagii happyy birthhdayyy yaaa Lemonnn, My Deer Lemonnn. I Lovee Youu Leon
         }
 
         function startWishesScroller() {
-            document.getElementById('wish-title').style.display = 'none';
-            document.getElementById('done-btn').style.display = 'none';
-            document.getElementById('friends-wishes-scene').style.display = 'flex';
-            document.getElementById('wishes-scroller').style.animation = 'scrollUp 45s linear forwards';
-            confetti({ particleCount: 250, spread: 100, origin: { y: 0.85 }, zIndex: 20001 });
+    document.getElementById('wish-title').style.display = 'none';
+    document.getElementById('done-btn').style.display = 'none';
+    
+    const scene = document.getElementById('friends-wishes-scene');
+    scene.style.display = 'flex';
+    
+    confetti({ particleCount: 250, spread: 100, origin: { y: 0.85 }, zIndex: 20001 });
+
+    // Fungsi menjalankan scroll otomatis
+    const runAutoScroll = () => {
+        if (autoScrollInterval) clearInterval(autoScrollInterval);
+        autoScrollInterval = setInterval(() => {
+            if (!isUserInteracting) {
+                scene.scrollTop += 0.8; // Kecepatan jalan
+            }
+        }, 20);
+    };
+
+    runAutoScroll();
+
+    // SENSOR: Berhenti saat disentuh, jalan lagi setelah 3 detik diam
+    const handleInteraction = () => {
+        isUserInteracting = true;
+        clearInterval(autoScrollInterval);
+        clearTimeout(resumeTimeout);
+        
+        resumeTimeout = setTimeout(() => {
+            isUserInteracting = false;
+            runAutoScroll();
+        }, 1000); 
+    };
+
+    // Pasang sensor ke layar
+    scene.addEventListener('wheel', handleInteraction);
+    scene.addEventListener('touchstart', handleInteraction);
+    scene.addEventListener('mousedown', handleInteraction);
         }
 
         const targetDate = new Date("April 13, 2026 00:00:00").getTime();
