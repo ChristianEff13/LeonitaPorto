@@ -71,21 +71,28 @@
 
         /* --- Night Scene --- */
         #page-surprise { display: none; position: fixed; inset: 0; z-index: 10000; background: var(--bg-night); opacity: 0; transition: opacity 2s ease; flex-direction: column; justify-content: center; align-items: center; text-align: center; overflow: hidden; }
-        .night-sky { position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle at 10% 20%, #0a151a 0%, #010305 70%); }
-        .moon { position: absolute; top: 10%; right: 15%; width: 100px; height: 100px; background: radial-gradient(circle at 30% 30%, #ffffff, #f0f0f0 40%, #d1d1d1 100%); border-radius: 50%; box-shadow: 0 0 50px rgba(255,255,255,0.25), inset -15px -15px 30px rgba(0,0,0,0.15); filter: drop-shadow(0 0 5px white); }
+        .night-sky { position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle at 10% 20%, #0a151a 0%, #010305 70%); overflow: hidden; }
+        .moon { position: absolute; top: 10%; right: 15%; width: 100px; height: 100px; background: radial-gradient(circle at 30% 30%, #ffffff, #f0f0f0 40%, #d1d1d1 100%); border-radius: 50%; box-shadow: 0 0 50px rgba(255,255,255,0.25), inset -15px -15px 30px rgba(0,0,0,0.15); filter: drop-shadow(0 0 5px white); transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1); }
         #wish-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 8vw, 4rem); font-style: italic; color: var(--gold); opacity: 0; transition: 1.5s; margin-bottom: 30px; }
         
-        /* Prioritas z-index yang diperbaiki */
         #bg-fireworks-canvas { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
         #shooting-star-canvas { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
         #firework-text-canvas { position: absolute; inset: 0; z-index: 100; pointer-events: none; }
+        #stars-night { position: absolute; inset: 0; z-index: 2; transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center center; }
 
-        #friends-wishes-scene { display: none; position: absolute; inset: 0; z-index: 200; flex-direction: column; align-items: center; padding-top: 80vh; padding-bottom: 100vh; color: #fff; overflow-y: scroll; scrollbar-width: none; opacity: 0; transition: opacity 2s ease; }
-        #friends-wishes-scene::-webkit-scrollbar { display: none; }
-        .wish-item { margin-bottom: 120px; text-align: center; max-width: 600px; padding: 0 20px; }
+        #friends-wishes-scene { display: none; position: absolute; inset: 0; z-index: 200; flex-direction: column; align-items: center; color: #fff; opacity: 0; transition: opacity 2s ease; padding-top: 10vh; }
+        #wishes-scroller-container { width: 100%; height: 80vh; overflow-y: scroll; scrollbar-width: none; -ms-overflow-style: none; padding-top: 50vh; padding-bottom: 50vh; scroll-behavior: auto; }
+        #wishes-scroller-container::-webkit-scrollbar { display: none; }
+        .wish-item { margin-bottom: 120px; text-align: center; max-width: 600px; padding: 0 20px; margin-left: auto; margin-right: auto; }
         .wish-item h3 { color: var(--gold); font-family: 'Cormorant Garamond'; font-size: 1.8rem; margin-bottom: 10px; }
         .wish-item p { color: #ccc; font-weight: 300; line-height: 1.8; font-size: 1.1rem; }
         
+        #final-aries-overlay { position: fixed; inset: 0; z-index: 15000; display: none; flex-direction: column; justify-content: center; align-items: center; background: transparent; text-align: center; padding: 40px; pointer-events: none; }
+        .aries-quote { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.4rem, 4vw, 2.5rem); font-style: italic; color: var(--white); opacity: 0; transition: opacity 3s ease; line-height: 1.6; max-width: 900px; text-shadow: 0 0 20px rgba(197, 160, 89, 0.5); margin-top: 50px; }
+        #aries-const-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; transition: transform 4s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center center; }
+
+        #back-to-wishes { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 16000; display: none; opacity: 0; transition: 1s; }
+
         #balloon-container { position: fixed; inset: 0; pointer-events: none; z-index: 9000; }
         .balloon-wrapper { position: absolute; pointer-events: auto; cursor: pointer; display: flex; flex-direction: column; align-items: center; z-index: 9500; }
         .balloon { width: 75px; height: 95px; border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%; position: relative; box-shadow: inset -6px -12px 18px rgba(0,0,0,0.2), 0 12px 25px rgba(0,0,0,0.15); }
@@ -160,22 +167,36 @@
 
     <!-- Surprise Page -->
     <div id="page-surprise">
-        <div class="night-sky"><div class="moon"></div><canvas id="stars-night"></canvas></div>
+        <div class="night-sky">
+            <div class="moon" id="moon-element"></div>
+            <canvas id="stars-night"></canvas>
+            <canvas id="aries-const-canvas"></canvas>
+        </div>
         <canvas id="bg-fireworks-canvas"></canvas>
         <canvas id="shooting-star-canvas"></canvas>
         <canvas id="firework-text-canvas"></canvas>
         <h2 id="wish-title">Make A Wish</h2>
         <button id="done-btn" class="next-btn" style="display: none; opacity: 0; transition: 0.5s; z-index: 20000;" onclick="handleDoneWish()">Done</button>
+        
         <div id="friends-wishes-scene">
-            <h1 style="font-family: 'Cormorant Garamond'; font-size: clamp(2rem, 6vw, 3rem); color: var(--gold); margin-bottom: 80px; font-style: italic;">Happy Birthday Leonita!</h1>
-            <div id="wishes-scroller">
+            <h1 style="font-family: 'Cormorant Garamond'; font-size: clamp(2rem, 6vw, 3rem); color: var(--gold); margin-bottom: 30px; font-style: italic;">Happy Birthday Leonita!</h1>
+            <div id="wishes-scroller-container">
                 <div class="wish-item"><h3>Teman 1</h3><p>HBD Leyonn! Semoga makin cantik, sukses kuliahnya, dan langgeng terus yaa sama pacarnya. Wish you all the best!</p></div>
                 <div class="wish-item"><h3>Teman 2</h3><p>Selamat umur 20! Selamat datang di kepala dua, semoga semua mimpinya tercapai satu per satu!</p></div>
                 <div class="wish-item"><h3>Teman 3</h3><p>Happy birthday! Bahagia selalu ya Leonita, tetap jadi orang baik dan ceria terus!</p></div>
                 <div class="wish-item"><h3>Teman 4</h3><p>HBD! Makan-makan ya ditunggu, sehat selalu dan sukses karirnya nanti!</p></div>
-                <div style="height: 100vh;"></div>
+                <div style="text-align: center; padding-bottom: 200px;">
+                    <button class="next-btn" onclick="startAriesJourney()">See The Stars</button>
+                </div>
             </div>
         </div>
+
+        <div id="final-aries-overlay">
+            <div class="aries-quote" id="final-quote">
+                “April 13, 2006 was not just a date; it was the beginning of a beautiful story written by a girl who would grow to inspire hearts around her.”
+            </div>
+        </div>
+        <button id="back-to-wishes" class="next-btn" style="border-radius: 5px; padding: 10px 20px; font-size: 0.6rem;" onclick="resetFromStars()">Back to Wishes</button>
     </div>
 
     <div id="balloon-container"></div>
@@ -183,7 +204,8 @@
     <script>
         let accessLevel = "none";
         const photos = ['https://i.postimg.cc/Q9t6F51F/image.jpg', 'https://i.postimg.cc/YG9XvgYL/image.jpg', 'https://i.postimg.cc/sQXnMS77/image.jpg', 'https://i.postimg.cc/mzDdPMC7/image.jpg', 'https://i.postimg.cc/G82M4YGJ/image.jpg', 'https://i.postimg.cc/gXJMxR8H/image.jpg', 'https://i.postimg.cc/0rmDqsWQ/image.jpg', 'https://i.postimg.cc/5jvLMV7t/image.jpg', 'https://i.postimg.cc/TyTNXBPc/image.jpg', 'https://i.postimg.cc/XZxHNxZm/image.jpg', 'https://i.postimg.cc/qtQbBQtD/image.jpg', 'https://i.postimg.cc/QBS4NSBP/image.jpg', 'https://i.postimg.cc/SXVTQVXv/image.jpg', 'https://i.postimg.cc/KKQqcQkS/image.jpg', 'https://i.postimg.cc/67zj6z2X/image.jpg', 'https://i.postimg.cc/4KwL4w7R/image.jpg', 'https://i.postimg.cc/2qTcjTbm/image.jpg', 'https://i.postimg.cc/QBS4NS9x/image.jpg', 'https://i.postimg.cc/KkH0BzDM/image.jpg', 'https://i.postimg.cc/3y9Sr94r/image.jpg', 'https://i.postimg.cc/8FwKkwJC/image.jpg', 'https://i.postimg.cc/JyK67KD0/image.jpg', 'https://i.postimg.cc/LYXyJfL2/image.jpg', 'https://i.postimg.cc/S2sZn8Cm/image.jpg', 'https://i.postimg.cc/WF39drgt/image.jpg', 'https://i.postimg.cc/47d8YtVK/image.jpg', 'https://i.postimg.cc/R6DgKFL7/image.jpg', 'https://i.postimg.cc/dkx5r1jT/image.jpg', 'https://i.postimg.cc/7GWK06ng/image.jpg', 'https://i.postimg.cc/KkH0BzDN/image.jpg', 'https://i.postimg.cc/23vhfDcm/image.jpg', 'https://i.postimg.cc/BLVmH6Bp/image.jpg', 'https://i.postimg.cc/Hch6Xx93/image.jpg'];
-        const fullText = `Halooo Lemon, sekarang kamu udah umur 20 lohh, gak berasa yaa waktu udah bawa kamu ke umur yang sekarang, dan mungkin kamu gak nyangka juga bisa ketemu aku di tengah-tengah perjalanan kamu. \n\nHappyy birthdayy yaaa My Deer Lemonn, mungkin aku bukan pacar yang terbaik, tapii kamuu yangg merupakan pacar terbaik buatt aku. Aku berdoa untuk kesehatan kamu, perlindungan buat kamu, berkat melimpah, umur yang panjang, dan masa depan yang Indah buat kamu Leyonn.\n\nMaaff jugaa yaa kalau aku engga bisa kasih kamu hadiah yangg mungkin kamu inginkan. Tapi aku harap kamu suka hadiah yangg akan aku kasih ke kamu Lemonn.\n\nSekali lagii happyy birthhdayyy yaaa Lemonnn, My Deer Lemonnn. I Lovee Youu Leonita Kumala Dewi, our love will be forever.`;
+        
+        const fullText = "Halooo Lemon, sekarang kamu udah umur 20 lohh, gak berasa yaa waktu udah bawa kamu ke umur yang sekarang, dan mungkin kamu gak nyangka juga bisa ketemu aku di tengah-tengah perjalanan kamu. \n\nHappyy birthdayy yaaa My Deer Lemonn, mungkin aku bukan pacar yang terbaik, tapii kamuu yangg merupakan pacar terbaik buatt aku. Aku berdoa untuk kesehatan kamu, perlindungan buat kamu, berkat melimpah, umur yang panjang, dan masa depan yang Indah buat kamu Leyonn (terutama di Beauty Industry).\n\nMaaff jugaa yaa kalau aku engga bisa kasih kamu hadiah yangg mungkin kamu inginkan. Tapi aku harap kamu suka hadiah yangg akan aku kasih ke kamu Lemonn.\n\nSekali lagii happyy birthdayyy yaaa Lemonnn, My Deer Lemonnn. I Lovee Youu Leonita Kumala Dewi, our love will be forever.";
 
         let popped = 0, gameActive = false;
         const colors = ['#FF5E5E', '#FFD700', '#FF7ED4', '#70FF8B', '#70D1FF', '#FF9F43'];
@@ -296,11 +318,18 @@
             setTimeout(() => { window.scrollTo(0,0); document.body.classList.remove('allow-scroll'); const p = document.getElementById('page-surprise'); p.style.display = 'flex'; p.style.opacity = '1'; initNightStars(); setTimeout(initShootingStarSequence, 1500); }, 1000);
         }
 
+        const ariesStars = [{x: 0.50, y: 0.40, r: 4}, {x: 0.58, y: 0.47, r: 3}, {x: 0.63, y: 0.60, r: 2}, {x: 0.73, y: 0.70, r: 2.5}];
+
         function initNightStars() {
             const c = document.getElementById('stars-night'); const ctx = c.getContext('2d');
             c.width = window.innerWidth; c.height = window.innerHeight;
-            let stars = Array(200).fill().map(() => ({ x: Math.random()*c.width, y: Math.random()*c.height, o: Math.random(), s: Math.random()*0.015, r: Math.random()*1.5 + 0.5 }));
-            function draw() { ctx.clearRect(0,0,c.width, c.height); stars.forEach(s => { ctx.fillStyle = `rgba(255,255,255,${s.o})`; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); s.o += s.s; if(s.o > 1 || s.o < 0) s.s = -s.s; }); requestAnimationFrame(draw); }
+            let stars = Array(250).fill().map(() => ({ x: Math.random()*c.width, y: Math.random()*c.height, o: Math.random(), s: Math.random()*0.015, r: Math.random()*1.5 + 0.5 }));
+            function draw() { 
+                ctx.clearRect(0,0,c.width, c.height); 
+                stars.forEach(s => { ctx.fillStyle = `rgba(255,255,255,${s.o})`; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); s.o += s.s; if(s.o > 1 || s.o < 0) s.s = -s.s; }); 
+                ariesStars.forEach(s => { ctx.fillStyle = '#fff'; ctx.shadowBlur = 10; ctx.shadowColor = 'white'; ctx.beginPath(); ctx.arc(s.x * c.width, s.y * c.height, s.r, 0, Math.PI*2); ctx.fill(); ctx.shadowBlur = 0; });
+                requestAnimationFrame(draw); 
+            }
             draw();
         }
 
@@ -344,9 +373,7 @@
             setTimeout(() => { const b = document.getElementById('done-btn'); b.style.display = 'inline-block'; setTimeout(() => b.style.opacity = '1', 50); }, 1500);
         }
 
-        // --- FIREWORKS TEXT FIX ---
         let textFireworks = []; 
-
         function handleDoneWish() {
             document.getElementById('wish-title').style.opacity = '0';
             document.getElementById('done-btn').style.opacity = '0';
@@ -367,16 +394,9 @@
             const totalWidth = fwCtx.measureText(text).width;
             let currentX = (fwCanvas.width - totalWidth) / 2;
             const centerY = fwCanvas.height * 0.45;
-
             text.split("").forEach(char => {
                 const w = fwCtx.measureText(char).width;
-                if(char !== " ") {
-                    textFireworks.push({
-                        char, x: currentX, targetY: centerY, ry: fwCanvas.height + 50,
-                        color: colors[Math.floor(Math.random()*colors.length)],
-                        exploded: false, alpha: 0, startTime: 0
-                    });
-                }
+                if(char !== " ") { textFireworks.push({ char, x: currentX, targetY: centerY, ry: fwCanvas.height + 50, color: colors[Math.floor(Math.random()*colors.length)], exploded: false, alpha: 0, startTime: 0 }); }
                 currentX += w;
             });
         }
@@ -384,61 +404,106 @@
         function mainTextLoop(now) {
             fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
             let anyActive = false;
-
             textFireworks.forEach(f => {
                 if(!f.exploded) {
-                    anyActive = true;
-                    // Draw Rocket
-                    fwCtx.fillStyle = "#fff";
-                    fwCtx.beginPath(); fwCtx.arc(f.x + 20, f.ry, 4, 0, Math.PI*2); fwCtx.fill();
-                    f.ry -= 15; 
-                    if(f.ry <= f.targetY) {
-                        f.exploded = true;
-                        f.startTime = now;
-                        // LEDAKAN SUPER (zIndex ditingkatkan agar paling depan)
-                        confetti({ 
-                            origin: { x: (f.x + 20) / fwCanvas.width, y: f.targetY / fwCanvas.height }, 
-                            colors: [f.color, '#ffffff', '#ffd700'], 
-                            particleCount: 150, 
-                            spread: 90, 
-                            gravity: 1.2,
-                            startVelocity: 40,
-                            scalar: 0.8,
-                            zIndex: 20000 
-                        });
-                    }
+                    anyActive = true; fwCtx.fillStyle = "#fff"; fwCtx.beginPath(); fwCtx.arc(f.x + 20, f.ry, 4, 0, Math.PI*2); fwCtx.fill(); f.ry -= 15; 
+                    if(f.ry <= f.targetY) { f.exploded = true; f.startTime = now; confetti({ origin: { x: (f.x + 20) / fwCanvas.width, y: f.targetY / fwCanvas.height }, colors: [f.color, '#ffffff', '#ffd700'], particleCount: 150, spread: 90, gravity: 1.2, startVelocity: 40, scalar: 0.8, zIndex: 20000 }); }
                 } else {
                     const elapsed = now - f.startTime;
                     if(elapsed < 4000) { 
-                        anyActive = true;
-                        const t = elapsed / 1000;
-                        if(t < 0.3) f.alpha = t * 3.3; 
-                        else if(t > 2.5) f.alpha = Math.max(0, 1 - (t - 2.5) / 1.5); 
-                        else f.alpha = 1;
-
+                        anyActive = true; const t = elapsed / 1000;
+                        if(t < 0.3) f.alpha = t * 3.3; else if(t > 2.5) f.alpha = Math.max(0, 1 - (t - 2.5) / 1.5); else f.alpha = 1;
                         const fontSize = Math.min(fwCanvas.width / 12, 80);
-                        fwCtx.save();
-                        fwCtx.globalAlpha = f.alpha;
-                        fwCtx.font = `bold italic ${fontSize}px 'Cormorant Garamond'`;
-                        fwCtx.shadowBlur = 20; fwCtx.shadowColor = f.color;
-                        fwCtx.fillStyle = f.color;
-                        fwCtx.fillText(f.char, f.x, f.targetY);
-                        fwCtx.restore();
+                        fwCtx.save(); fwCtx.globalAlpha = f.alpha; fwCtx.font = `bold italic ${fontSize}px 'Cormorant Garamond'`; fwCtx.shadowBlur = 20; fwCtx.shadowColor = f.color; fwCtx.fillStyle = f.color; fwCtx.fillText(f.char, f.x, f.targetY); fwCtx.restore();
                     }
                 }
             });
-
-            if(anyActive) requestAnimationFrame(mainTextLoop);
-            else setTimeout(startScroller, 800);
+            if(anyActive) requestAnimationFrame(mainTextLoop); else setTimeout(startScroller, 800);
         }
+
+        // --- NEW IMPROVED SCROLLER LOGIC ---
+        let isUserScrolling = false;
+        let scrollTimeout;
+        let scrollPos = 0;
+        let autoScrollActive = false;
+        let scrollerInitialized = false;
 
         function startScroller() {
             const s = document.getElementById('friends-wishes-scene');
-            if(s.style.display === 'flex') return;
+            const container = document.getElementById('wishes-scroller-container');
+            
             s.style.display = 'flex';
-            setTimeout(() => s.style.opacity = '1', 100);
-            const scrollFires = setInterval(() => { if(s.style.opacity === '1') createBGFirework(); else clearInterval(scrollFires); }, 1500);
-            setInterval(() => { s.scrollTop += 0.8; }, 20);
+            autoScrollActive = true;
+
+            if(!scrollerInitialized) {
+                const handleActivity = () => {
+                    isUserScrolling = true;
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(() => {
+                        isUserScrolling = false;
+                        scrollPos = container.scrollTop;
+                    }, 500); // 0.5 detik pause
+                };
+                container.addEventListener('wheel', handleActivity);
+                container.addEventListener('touchstart', handleActivity);
+                container.addEventListener('touchmove', handleActivity);
+                scrollerInitialized = true;
+            }
+
+            setTimeout(() => {
+                s.style.opacity = '1';
+                scrollPos = container.scrollTop;
+                requestAnimationFrame(scrollStep);
+            }, 100);
+        }
+
+        function scrollStep() {
+            if(!autoScrollActive) return;
+            const container = document.getElementById('wishes-scroller-container');
+            if(!isUserScrolling) {
+                scrollPos += 0.5;
+                container.scrollTop = scrollPos;
+                if(container.scrollTop >= container.scrollHeight - container.clientHeight) {
+                    // Reset to top if end reached
+                    scrollPos = 0;
+                }
+            } else {
+                scrollPos = container.scrollTop;
+            }
+            requestAnimationFrame(scrollStep);
+        }
+
+        function startAriesJourney() {
+            autoScrollActive = false;
+            const scene = document.getElementById('friends-wishes-scene');
+            scene.style.opacity = '0';
+            const stars = document.getElementById('stars-night'), ariesCanvas = document.getElementById('aries-const-canvas'), moon = document.getElementById('moon-element');
+            stars.style.transform = 'scale(1.8) translate(-10%, -10%)'; ariesCanvas.style.transform = 'scale(1.8) translate(-10%, -10%)'; moon.style.transform = 'translate(150%, -150%) scale(0.2)';
+            setTimeout(() => { scene.style.display = 'none'; document.getElementById('final-aries-overlay').style.display = 'flex'; drawAriesLines(); const backBtn = document.getElementById('back-to-wishes'); backBtn.style.display = 'block'; setTimeout(() => backBtn.style.opacity = '1', 500); }, 2000);
+        }
+
+        function drawAriesLines() {
+            const c = document.getElementById('aries-const-canvas'); const ctx = c.getContext('2d');
+            c.width = window.innerWidth; c.height = window.innerHeight;
+            let progress = 0;
+            function animate() {
+                ctx.clearRect(0,0,c.width, c.height); ctx.strokeStyle = 'rgba(197, 160, 89, 0.9)'; ctx.lineWidth = 1; ctx.shadowBlur = 10; ctx.shadowColor = 'var(--gold)'; ctx.beginPath(); ctx.moveTo(ariesStars[0].x * c.width, ariesStars[0].y * c.height);
+                for(let i=1; i < ariesStars.length; i++) {
+                    const pStart = ariesStars[i-1], pEnd = ariesStars[i]; const segmentProgress = Math.min(1, Math.max(0, progress - (i-1)));
+                    const currX = (pStart.x + (pEnd.x - pStart.x) * segmentProgress) * c.width; const currY = (pStart.y + (pEnd.y - pStart.y) * segmentProgress) * c.height;
+                    ctx.lineTo(currX, currY); if (segmentProgress < 1) break;
+                }
+                ctx.stroke(); progress += 0.02; if(progress < ariesStars.length) requestAnimationFrame(animate); else { document.getElementById('final-quote').style.opacity = '1'; }
+            }
+            animate();
+        }
+
+        function resetFromStars() {
+            const overlay = document.getElementById('final-aries-overlay'), quote = document.getElementById('final-quote'), backBtn = document.getElementById('back-to-wishes'), stars = document.getElementById('stars-night'), ariesCanvas = document.getElementById('aries-const-canvas'), moon = document.getElementById('moon-element');
+            quote.style.opacity = '0'; backBtn.style.opacity = '0';
+            const ctx = ariesCanvas.getContext('2d'); ctx.clearRect(0,0,ariesCanvas.width, ariesCanvas.height);
+            stars.style.transform = 'scale(1) translate(0, 0)'; ariesCanvas.style.transform = 'scale(1) translate(0, 0)'; moon.style.transform = 'translate(0, 0) scale(1)';
+            setTimeout(() => { overlay.style.display = 'none'; backBtn.style.display = 'none'; startScroller(); }, 2000);
         }
 
         setInterval(() => {
